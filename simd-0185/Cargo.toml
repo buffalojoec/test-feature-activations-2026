@@ -1,0 +1,20 @@
+[package]
+name = "simd-0185"
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]
+
+[[bin]]
+name = "simd-0185"
+path = "bin/main.rs"
+
+[dependencies]
+simd-0185-interface = { path = "interface" }
+solana-program-entrypoint = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-vote-interface = { workspace = true }
+
+[lints]
+workspace = true

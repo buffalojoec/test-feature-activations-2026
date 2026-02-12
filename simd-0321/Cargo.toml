@@ -1,0 +1,19 @@
+[package]
+name = "simd-0321"
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]
+
+[[bin]]
+name = "simd-0321"
+path = "bin/main.rs"
+
+[dependencies]
+simd-0321-interface = { path = "interface" }
+solana-cpi = { workspace = true }
+solana-program-entrypoint = { workspace = true }
+
+[lints]
+workspace = true

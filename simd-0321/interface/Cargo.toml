@@ -1,0 +1,9 @@
+[package]
+name = "simd-0321-interface"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+
+[lints]
+workspace = true

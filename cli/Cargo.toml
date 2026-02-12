@@ -1,0 +1,10 @@
+[package]
+name = "cli"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[lints]
+workspace = true
