@@ -10,10 +10,11 @@ pub enum ProgramInstruction {
     ///
     /// Accounts expected by this instruction:
     ///
-    /// 0. `[w]` Uninitalized vote account
-    /// 1. `[ ]` Identity PDA (below)
-    /// 2. `[ ]` Rent sysvar
-    /// 3. `[ ]` Clock sysvar
+    /// 0. `[ws]` Payer
+    /// 1. `[w]` Uninitialized vote account
+    /// 2. `[ ]` Identity PDA (below)
+    /// 3. `[ ]` Rent sysvar
+    /// 4. `[ ]` Clock sysvar
     Create {
         authorized_voter: Pubkey,
         authorized_withdrawer: Pubkey,
@@ -52,6 +53,7 @@ impl ProgramInstruction {
     }
 
     pub fn create(
+        payer: &Pubkey,
         vote_account: &Pubkey,
         authorized_voter: &Pubkey,
         authorized_withdrawer: &Pubkey,
@@ -66,10 +68,12 @@ impl ProgramInstruction {
         Instruction {
             program_id: PROGRAM_ID_AS_PUBKEY,
             accounts: vec![
-                AccountMeta::new(*vote_account, false),
+                AccountMeta::new(*payer, true),
+                AccountMeta::new(*vote_account, true),
                 AccountMeta::new_readonly(get_identity_pda(), false),
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::rent::ID, false),
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::clock::ID, false),
+                AccountMeta::new_readonly(solana_sdk_ids::system_program::ID, false),
             ],
             data,
         }
@@ -91,6 +95,10 @@ const BUMP: u8 = 254;
 const PROGRAM_ID: &str = "33H7aP44PfN6WhknyrDo6wuipnwusHAQ1kK8b4anLwWj";
 const PROGRAM_ID_AS_PUBKEY: Pubkey = Pubkey::from_str_const(PROGRAM_ID);
 const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
+
+pub fn get_identity_seeds_with_bump() -> [&'static [u8]; 3] {
+    [PREFIX, BASE_AS_PUBKEY.as_ref(), &[BUMP]]
+}
 
 pub const fn get_identity_pda() -> Pubkey {
     let bytes = Sha256::new()
@@ -124,12 +132,14 @@ mod tests {
 
     #[test]
     fn test_create_roundtrip() {
+        let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
         let authorized_voter = Pubkey::new_unique();
         let authorized_withdrawer = Pubkey::new_unique();
         let commission = 7;
 
         let ix = ProgramInstruction::create(
+            &payer,
             &vote_account,
             &authorized_voter,
             &authorized_withdrawer,
