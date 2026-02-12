@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "cli",
     "simd-0185",
     "simd-0185/interface",
     "simd-0321",
