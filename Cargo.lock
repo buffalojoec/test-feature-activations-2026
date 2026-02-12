@@ -459,7 +459,11 @@ name = "simd-0185"
 version = "0.0.0"
 dependencies = [
  "simd-0185-interface",
+ "solana-account-info",
+ "solana-cpi",
+ "solana-msg",
  "solana-program-entrypoint",
+ "solana-program-error",
  "solana-pubkey 4.0.0",
  "solana-vote-interface",
 ]
