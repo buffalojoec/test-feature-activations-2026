@@ -3,6 +3,7 @@
 use sha2_const_stable::Sha256;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_vote_interface::{instruction::VoteInstruction, state::VoteInit};
 
 pub enum ProgramInstruction {
     /// Create a v4 vote account via CPI.
@@ -100,6 +101,21 @@ pub const fn get_identity_pda() -> Pubkey {
         .update(PDA_MARKER)
         .finalize();
     Pubkey::new_from_array(bytes)
+}
+
+pub fn vote_initialize_account(vote_pubkey: &Pubkey, vote_init: &VoteInit) -> Instruction {
+    let account_metas = vec![
+        AccountMeta::new(*vote_pubkey, false),
+        AccountMeta::new_readonly(solana_sdk_ids::sysvar::rent::ID, false),
+        AccountMeta::new_readonly(solana_sdk_ids::sysvar::clock::ID, false),
+        AccountMeta::new_readonly(vote_init.node_pubkey, true),
+    ];
+
+    Instruction::new_with_bincode(
+        solana_sdk_ids::vote::ID,
+        &VoteInstruction::InitializeAccount(*vote_init),
+        account_metas,
+    )
 }
 
 #[cfg(test)]
