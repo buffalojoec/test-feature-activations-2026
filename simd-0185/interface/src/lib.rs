@@ -15,6 +15,8 @@ pub enum ProgramInstruction {
     /// 2. `[ ]` Identity PDA (below)
     /// 3. `[ ]` Rent sysvar
     /// 4. `[ ]` Clock sysvar
+    /// 5. `[ ]` System program
+    /// 6. `[ ]` Vote program
     Create {
         authorized_voter: Pubkey,
         authorized_withdrawer: Pubkey,
@@ -74,6 +76,7 @@ impl ProgramInstruction {
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::rent::ID, false),
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::clock::ID, false),
                 AccountMeta::new_readonly(solana_sdk_ids::system_program::ID, false),
+                AccountMeta::new_readonly(solana_sdk_ids::vote::ID, false),
             ],
             data,
         }

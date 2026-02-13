@@ -25,7 +25,7 @@ solana-system-interface = { workspace = true, features = ["bincode"] }
 solana-vote-interface = { workspace = true, features = ["bincode"] }
 
 [dev-dependencies]
-mollusk-svm = { workspace = true }
+mollusk-svm = { workspace = true, features = ["all-builtins"] }
 solana-account = { workspace = true }
 
 [lints]

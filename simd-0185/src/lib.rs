@@ -1,5 +1,5 @@
 use {
-    simd_0185_interface::{get_identity_seeds_with_bump, ProgramInstruction},
+    simd_0185_interface::{get_identity_seeds_with_bump, vote_initialize_account, ProgramInstruction},
     solana_account_info::AccountInfo,
     solana_cpi::invoke_signed,
     solana_msg::msg,
@@ -7,7 +7,7 @@ use {
     solana_pubkey::Pubkey,
     solana_rent::Rent,
     solana_sysvar::SysvarSerialize,
-    solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
+    solana_vote_interface::state::{VoteInit, VoteStateV4, VoteStateVersions},
 };
 
 solana_program_entrypoint::entrypoint!(process);
@@ -43,7 +43,24 @@ fn process_create(
         &[pda_signer_seeds],
     )?;
 
-    // TODO: CPI to Vote Program to initialize the account.
+    // CPI to Vote Program: initialize the vote account.
+    let vote_init = VoteInit {
+        node_pubkey: *identity_pda.key,
+        authorized_voter,
+        authorized_withdrawer,
+        commission,
+    };
+    let init_ix = vote_initialize_account(vote_account.key, &vote_init);
+    invoke_signed(
+        &init_ix,
+        &[
+            vote_account.clone(),
+            rent_sysvar.clone(),
+            clock_sysvar.clone(),
+            identity_pda.clone(),
+        ],
+        &[pda_signer_seeds],
+    )?;
 
     Ok(())
 }
@@ -82,11 +99,15 @@ fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> Prog
 #[cfg(test)]
 mod tests {
     use {
-        mollusk_svm::{program::keyed_account_for_system_program, result::Check, Mollusk},
-        simd_0185_interface::{get_identity_pda, ProgramInstruction},
+        mollusk_svm::{
+            program::{keyed_account_for_system_program, create_keyed_account_for_builtin_program},
+            result::Check,
+            Mollusk,
+        },
+        simd_0185_interface::{ProgramInstruction, get_identity_pda},
         solana_account::Account,
         solana_pubkey::Pubkey,
-        solana_vote_interface::state::VoteStateV4,
+        solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
     };
 
     const PROGRAM_ID: Pubkey =
@@ -99,18 +120,21 @@ mod tests {
         let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
         let identity_pda = get_identity_pda();
+        let authorized_voter = Pubkey::new_unique();
+        let authorized_withdrawer = Pubkey::new_unique();
+        let commission = 10;
 
         let instruction = ProgramInstruction::create(
             &payer,
             &vote_account,
-            &Pubkey::new_unique(),
-            &Pubkey::new_unique(),
-            10,
+            &authorized_voter,
+            &authorized_withdrawer,
+            commission,
         );
 
         let lamports = mollusk.sysvars.rent.minimum_balance(VoteStateV4::size_of());
 
-        mollusk.process_and_validate_instruction(
+        let result = mollusk.process_and_validate_instruction(
             &instruction,
             &[
                 (payer, Account::new(lamports * 2, 0, &solana_sdk_ids::system_program::ID)),
@@ -119,6 +143,10 @@ mod tests {
                 mollusk.sysvars.keyed_account_for_rent_sysvar(),
                 mollusk.sysvars.keyed_account_for_clock_sysvar(),
                 keyed_account_for_system_program(),
+                create_keyed_account_for_builtin_program(
+                    &solana_sdk_ids::vote::ID,
+                    "vote_program",
+                ),
             ],
             &[
                 Check::success(),
@@ -127,5 +155,16 @@ mod tests {
                     .build(),
             ],
         );
+
+        let vote_account_data = &result.get_account(&vote_account).unwrap().data;
+        let vote_state = match VoteStateVersions::deserialize(vote_account_data) {
+            Ok(VoteStateVersions::V4(state)) => state,
+            _ => panic!("expected v4 vote state"),
+        };
+
+        assert_eq!(vote_state.node_pubkey, identity_pda);
+        assert_eq!(vote_state.authorized_voters.last().unwrap().1, &authorized_voter);
+        assert_eq!(vote_state.authorized_withdrawer, authorized_withdrawer);
+        assert_eq!(vote_state.inflation_rewards_commission_bps, commission as u16 * 100);
     }
 }

@@ -12,7 +12,7 @@ version = "0.0.0"
 edition = "2021"
 
 [workspace.dependencies]
-mollusk-svm = "0.10"
+mollusk-svm = "0.10.3"
 sha2-const-stable = "0.1.0"
 solana-account = "3.4"
 solana-account-info = "3.1"
