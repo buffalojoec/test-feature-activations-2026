@@ -3832,9 +3832,12 @@ name = "simd-0321"
 version = "0.0.0"
 dependencies = [
  "helpers",
+ "mollusk-svm",
  "simd-0321-interface",
+ "solana-instruction",
  "solana-msg",
  "solana-program-entrypoint",
+ "solana-pubkey 4.0.0",
 ]
 
 [[package]]

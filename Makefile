@@ -1,4 +1,3 @@
-# Dynamic program discovery.
 PROGRAMS := $(shell find . -maxdepth 1 -type d -name 'simd-*' -exec test -f {}/Cargo.toml \; -print | sed 's|./||' | sort)
 
 .PHONY: build
@@ -6,24 +5,25 @@ PROGRAMS := $(shell find . -maxdepth 1 -type d -name 'simd-*' -exec test -f {}/C
 list:
 	@for prog in $(PROGRAMS); do echo $$prog; done
 
-# Build all programs.
-build: $(addprefix build-,$(PROGRAMS))
-
-# Build a specific program.
-build-%:
-	cargo build-sbf --manifest-path $*/Cargo.toml
-
-# Deploy a specific program.
-deploy-%:
-	solana program deploy target/deploy/$(subst -,_,$*).so --program-id $*/keypair.json
-
-# Get a program ID.
 get-id-%:
 	solana address -k $*/keypair.json
 
-# Run a program test binary. Optional: make test-<program> NETWORK=localnet
-test-%:
+build: $(addprefix build-,$(PROGRAMS))
+
+build-%:
+	cargo build-sbf --manifest-path $*/Cargo.toml
+
+deploy-%:
+	solana program deploy target/deploy/$(subst -,_,$*).so --program-id $*/keypair.json
+
+run-%:
 	cargo run -p $* --features bin $(if $(NETWORK),-- $(NETWORK))
+
+test:
+	cargo test $(addprefix -p ,helpers $(addsuffix -interface,$(PROGRAMS)))
+
+test-sbf-%:
+	cargo test-sbf --manifest-path $*/Cargo.toml
 
 fmt:
 	cargo +nightly fmt --all --check

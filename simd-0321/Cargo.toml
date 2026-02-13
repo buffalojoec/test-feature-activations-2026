@@ -20,5 +20,10 @@ simd-0321-interface = { path = "interface" }
 solana-msg = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 
+[dev-dependencies]
+mollusk-svm = { workspace = true }
+solana-instruction = { workspace = true }
+solana-pubkey = { workspace = true }
+
 [lints]
 workspace = true
