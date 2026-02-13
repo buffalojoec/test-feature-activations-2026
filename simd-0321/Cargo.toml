@@ -17,7 +17,7 @@ bin = ["dep:helpers"]
 [dependencies]
 helpers = { workspace = true, optional = true }
 simd-0321-interface = { path = "interface" }
-solana-cpi = { workspace = true }
+solana-msg = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 
 [lints]

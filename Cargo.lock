@@ -3833,13 +3833,17 @@ version = "0.0.0"
 dependencies = [
  "helpers",
  "simd-0321-interface",
- "solana-cpi",
+ "solana-msg",
  "solana-program-entrypoint",
 ]
 
 [[package]]
 name = "simd-0321-interface"
 version = "0.0.0"
+dependencies = [
+ "solana-program-error",
+ "solana-pubkey 4.0.0",
+]
 
 [[package]]
 name = "simd-adler32"
