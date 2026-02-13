@@ -1,12 +1,21 @@
 # Test Programs
 
-→ [Full Makefile overview](#makefile)
+> [Full Makefile overview](#makefile)
 
-**Note:** Generate your own program keypairs and place them at `<prog>/keypair.json`
-(e.g. `solana-keygen new -o simd-0321/keypair.json`). The deploy and get-id
-targets expect keypairs at these paths.
+### Keypairs
 
-## SIMD-0185: Vote State V4
+Program keypairs are **gitignored**. Generate one per program before building
+binaries or deploying:
+
+```sh
+solana-keygen new -o simd-0185/keypair.json
+solana-keygen new -o simd-0321/keypair.json
+```
+
+The client binaries read their program ID from `<prog>/keypair.json` at
+runtime, so the keypair must exist even for local runs (`make run-*`).
+
+## 🗳️ SIMD-0185: Vote State V4
 
 Tests the `vote_state_v4` feature. The program creates a v4 vote account via
 CPI to the Vote Program, then reads back and logs its fields.
@@ -41,7 +50,7 @@ Queries `getProgramAccounts` filtering for the v4 discriminator. Results are
 saved to `scripts/out/vote_v4_accounts_testnet.txt`. Omit the argument to use
 the current `solana config` RPC.
 
-## SIMD-0321: Instruction Data Pointer in VM r2
+## 🧪 SIMD-0321: Instruction Data Pointer in VM r2
 
 Tests the `provide_instruction_data_offset_in_vm_r2` feature, which passes
 instruction data via the r2 register.
@@ -50,8 +59,8 @@ instruction data via the r2 register.
 
 ```sh
 make build-simd-0321
-make deploy-simd-0321               # uses keypair in simd-0321/keypair.json
-make get-id-simd-0321               # print the program address
+make deploy-simd-0321
+make get-id-simd-0321
 ```
 
 ### Run on testnet
@@ -77,11 +86,11 @@ The client sends two instructions in a single transaction:
 | `make get-id-<prog>` | Get a program's address from its keypair |
 | `make run-<prog>` | Run a program's client binary |
 | `make run-<prog> NETWORK=<url>` | Run against a specific network |
-| `make test` | Run all unit tests |
-| `make test-sbf-<prog>` | Run SBF tests for a program |
-| `make fmt` | Check formatting |
-| `make fmt-fix` | Fix formatting |
-| `make clippy` | Run clippy lints |
+| `make test` | Run unit tests (interfaces + helpers) |
+| `make test-sbf-<prog>` | Run SBF tests for a program (requires `cargo-build-sbf`) |
+| `make fmt` | Check formatting (requires nightly) |
+| `make fmt-fix` | Fix formatting (requires nightly) |
+| `make clippy` | Run clippy lints (requires nightly) |
 | `make clean` | Clean build artifacts |
 
 `<prog>` is a directory name, e.g. `simd-0321`.
