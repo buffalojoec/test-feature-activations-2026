@@ -1,6 +1,6 @@
 //! Interface for the SIMD-0321 test program.
 
-use {solana_program_error::ProgramError, solana_pubkey::Pubkey};
+use {solana_instruction::Instruction, solana_program_error::ProgramError, solana_pubkey::Pubkey};
 
 /// Secret easter egg for the program to print structured logs instead of bytes.
 #[derive(Debug)]
@@ -48,6 +48,17 @@ impl EasterEgg {
             key: KEY_AS_PUBKEY.to_bytes(),
             message,
         }
+    }
+}
+
+const PROGRAM_ID: &str = "HvhLZc4NB8gBjG2hMaHcCAnXto8pFTUs8hd434WJFWh1";
+pub const PROGRAM_ID_AS_PUBKEY: Pubkey = Pubkey::from_str_const(PROGRAM_ID);
+
+pub fn build_instruction(data: Vec<u8>) -> Instruction {
+    Instruction {
+        program_id: PROGRAM_ID_AS_PUBKEY,
+        accounts: vec![],
+        data,
     }
 }
 
