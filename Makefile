@@ -1,18 +1,7 @@
 # Dynamic program discovery.
 PROGRAMS := $(shell find . -maxdepth 1 -type d -name 'simd-*' -exec test -f {}/Cargo.toml \; -print | sed 's|./||' | sort)
 
-.PHONY: list build deploy test get-id help clean $(PROGRAMS)
-
-help:
-	@echo "Usage:"
-	@echo "  make list              - List available programs."
-	@echo "  make build             - Build all programs."
-	@echo "  make build-<program>   - Build a specific program."
-	@echo "  make deploy-<program>  - Deploy a specific program."
-	@echo "  make get-id-<program>  - Get program ID."
-	@echo "  make test-<program>    - Run program test binary."
-	@echo ""
-	@echo "Available programs: $(PROGRAMS)"
+.PHONY: build
 
 list:
 	@for prog in $(PROGRAMS); do echo $$prog; done
@@ -35,6 +24,15 @@ get-id-%:
 # Run a program test binary.
 test-%:
 	cargo run -p $*
+
+fmt:
+	cargo +nightly fmt --all --check
+
+fmt-fix:
+	cargo +nightly fmt --all
+
+clippy:
+	cargo +nightly clippy --all-targets -- -D warnings
 
 clean:
 	cargo clean

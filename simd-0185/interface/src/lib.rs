@@ -1,9 +1,11 @@
 //! Interface for the SIMD-0185 test program.
 
-use sha2_const_stable::Sha256;
-use solana_instruction::{AccountMeta, Instruction};
-use solana_pubkey::Pubkey;
-use solana_vote_interface::{instruction::VoteInstruction, state::VoteInit};
+use {
+    sha2_const_stable::Sha256,
+    solana_instruction::{AccountMeta, Instruction},
+    solana_pubkey::Pubkey,
+    solana_vote_interface::{instruction::VoteInstruction, state::VoteInit},
+};
 
 pub enum ProgramInstruction {
     /// Create a v4 vote account via CPI.
@@ -38,8 +40,7 @@ impl ProgramInstruction {
     pub fn decode(input: &[u8]) -> Self {
         match input.first() {
             Some(&Self::CREATE) => {
-                let authorized_voter =
-                    Pubkey::new_from_array(input[1..33].try_into().unwrap());
+                let authorized_voter = Pubkey::new_from_array(input[1..33].try_into().unwrap());
                 let authorized_withdrawer =
                     Pubkey::new_from_array(input[33..65].try_into().unwrap());
                 let commission = input[65];
@@ -165,10 +166,8 @@ mod tests {
 
     #[test]
     fn test_pda() {
-        let (_pda, bump) = Pubkey::find_program_address(
-            &[PREFIX, BASE_AS_PUBKEY.as_ref()],
-            &PROGRAM_ID_AS_PUBKEY,
-        );
+        let (_pda, bump) =
+            Pubkey::find_program_address(&[PREFIX, BASE_AS_PUBKEY.as_ref()], &PROGRAM_ID_AS_PUBKEY);
         assert_eq!(bump, BUMP);
     }
 }

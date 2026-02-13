@@ -1,5 +1,7 @@
 use {
-    simd_0185_interface::{get_identity_seeds_with_bump, vote_initialize_account, ProgramInstruction},
+    simd_0185_interface::{
+        get_identity_seeds_with_bump, vote_initialize_account, ProgramInstruction,
+    },
     solana_account_info::AccountInfo,
     solana_cpi::invoke_signed,
     solana_msg::msg,
@@ -75,12 +77,30 @@ fn process_view(accounts: &[AccountInfo]) -> ProgramResult {
     };
 
     msg!("Vote State (v4):");
-    msg!("  node_pubkey:                    {}", vote_state.node_pubkey);
-    msg!("  authorized_withdrawer:          {}", vote_state.authorized_withdrawer);
-    msg!("  inflation_rewards_collector:    {}", vote_state.inflation_rewards_collector);
-    msg!("  block_revenue_collector:        {}", vote_state.block_revenue_collector);
-    msg!("  inflation_rewards_commission:   {} bps", vote_state.inflation_rewards_commission_bps);
-    msg!("  block_revenue_commission:       {} bps", vote_state.block_revenue_commission_bps);
+    msg!(
+        "  node_pubkey:                    {}",
+        vote_state.node_pubkey
+    );
+    msg!(
+        "  authorized_withdrawer:          {}",
+        vote_state.authorized_withdrawer
+    );
+    msg!(
+        "  inflation_rewards_collector:    {}",
+        vote_state.inflation_rewards_collector
+    );
+    msg!(
+        "  block_revenue_collector:        {}",
+        vote_state.block_revenue_collector
+    );
+    msg!(
+        "  inflation_rewards_commission:   {} bps",
+        vote_state.inflation_rewards_commission_bps
+    );
+    msg!(
+        "  block_revenue_commission:       {} bps",
+        vote_state.block_revenue_commission_bps
+    );
 
     Ok(())
 }
@@ -91,7 +111,12 @@ fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> Prog
             authorized_voter,
             authorized_withdrawer,
             commission,
-        } => process_create(accounts, authorized_voter, authorized_withdrawer, commission),
+        } => process_create(
+            accounts,
+            authorized_voter,
+            authorized_withdrawer,
+            commission,
+        ),
         ProgramInstruction::View => process_view(accounts),
     }
 }
@@ -100,11 +125,11 @@ fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> Prog
 mod tests {
     use {
         mollusk_svm::{
-            program::{keyed_account_for_system_program, create_keyed_account_for_builtin_program},
+            program::{create_keyed_account_for_builtin_program, keyed_account_for_system_program},
             result::Check,
             Mollusk,
         },
-        simd_0185_interface::{ProgramInstruction, get_identity_pda},
+        simd_0185_interface::{get_identity_pda, ProgramInstruction},
         solana_account::Account,
         solana_pubkey::Pubkey,
         solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
@@ -137,16 +162,16 @@ mod tests {
         let result = mollusk.process_and_validate_instruction(
             &instruction,
             &[
-                (payer, Account::new(lamports * 2, 0, &solana_sdk_ids::system_program::ID)),
+                (
+                    payer,
+                    Account::new(lamports * 2, 0, &solana_sdk_ids::system_program::ID),
+                ),
                 (vote_account, Account::default()),
                 (identity_pda, Account::default()),
                 mollusk.sysvars.keyed_account_for_rent_sysvar(),
                 mollusk.sysvars.keyed_account_for_clock_sysvar(),
                 keyed_account_for_system_program(),
-                create_keyed_account_for_builtin_program(
-                    &solana_sdk_ids::vote::ID,
-                    "vote_program",
-                ),
+                create_keyed_account_for_builtin_program(&solana_sdk_ids::vote::ID, "vote_program"),
             ],
             &[
                 Check::success(),
@@ -163,8 +188,14 @@ mod tests {
         };
 
         assert_eq!(vote_state.node_pubkey, identity_pda);
-        assert_eq!(vote_state.authorized_voters.last().unwrap().1, &authorized_voter);
+        assert_eq!(
+            vote_state.authorized_voters.last().unwrap().1,
+            &authorized_voter
+        );
         assert_eq!(vote_state.authorized_withdrawer, authorized_withdrawer);
-        assert_eq!(vote_state.inflation_rewards_commission_bps, commission as u16 * 100);
+        assert_eq!(
+            vote_state.inflation_rewards_commission_bps,
+            commission as u16 * 100
+        );
     }
 }
