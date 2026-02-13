@@ -1,13 +1,17 @@
 use {
     helpers::{
-        CommitmentConfig, Keypair, OptionSerializer, RpcTransactionConfig, Signer, Transaction,
-        UiTransactionEncoding,
+        read_keypair_file, CommitmentConfig, Keypair, OptionSerializer, RpcTransactionConfig,
+        Signer, Transaction, UiTransactionEncoding,
     },
     simd_0185_interface::ProgramInstruction,
 };
 
 fn main() {
     let (client, payer) = helpers::client_from_args();
+
+    let program_id =
+        read_keypair_file("simd-0185/keypair.json").expect("failed to read program keypair");
+    let program_id = program_id.pubkey();
 
     // Generate a fresh keypair for the vote account.
     let vote_account = Keypair::new();
@@ -24,6 +28,7 @@ fn main() {
 
     // Create instruction.
     let create_ix = ProgramInstruction::create(
+        &program_id,
         &payer.pubkey(),
         &vote_account.pubkey(),
         &authorized_voter.pubkey(),
@@ -32,7 +37,7 @@ fn main() {
     );
 
     // View instruction.
-    let view_ix = ProgramInstruction::view(&vote_account.pubkey());
+    let view_ix = ProgramInstruction::view(&program_id, &vote_account.pubkey());
 
     // Build, sign, and send the transaction.
     let blockhash = client

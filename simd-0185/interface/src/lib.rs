@@ -1,7 +1,6 @@
 //! Interface for the SIMD-0185 test program.
 
 use {
-    sha2_const_stable::Sha256,
     solana_instruction::{AccountMeta, Instruction},
     solana_pubkey::Pubkey,
     solana_vote_interface::{instruction::VoteInstruction, state::VoteInit},
@@ -56,6 +55,7 @@ impl ProgramInstruction {
     }
 
     pub fn create(
+        program_id: &Pubkey,
         payer: &Pubkey,
         vote_account: &Pubkey,
         authorized_voter: &Pubkey,
@@ -68,12 +68,14 @@ impl ProgramInstruction {
         data.extend_from_slice(authorized_withdrawer.as_ref());
         data.push(commission);
 
+        let (identity_pda, _) = get_identity_pda(program_id);
+
         Instruction {
-            program_id: PROGRAM_ID_AS_PUBKEY,
+            program_id: *program_id,
             accounts: vec![
                 AccountMeta::new(*payer, true),
                 AccountMeta::new(*vote_account, true),
-                AccountMeta::new_readonly(get_identity_pda(), false),
+                AccountMeta::new_readonly(identity_pda, false),
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::rent::ID, false),
                 AccountMeta::new_readonly(solana_sdk_ids::sysvar::clock::ID, false),
                 AccountMeta::new_readonly(solana_sdk_ids::system_program::ID, false),
@@ -83,9 +85,9 @@ impl ProgramInstruction {
         }
     }
 
-    pub fn view(vote_account: &Pubkey) -> Instruction {
+    pub fn view(program_id: &Pubkey, vote_account: &Pubkey) -> Instruction {
         Instruction {
-            program_id: PROGRAM_ID_AS_PUBKEY,
+            program_id: *program_id,
             accounts: vec![AccountMeta::new_readonly(*vote_account, false)],
             data: vec![Self::VIEW],
         }
@@ -95,24 +97,13 @@ impl ProgramInstruction {
 const PREFIX: &[u8] = b"test_identity";
 const BASE: &str = "8x2TcvfbVbBScE5kdJ8sdpJLFY5n84fM1rZBrC1QzFA1";
 const BASE_AS_PUBKEY: Pubkey = Pubkey::from_str_const(BASE);
-const BUMP: u8 = 254;
-const PROGRAM_ID: &str = "33H7aP44PfN6WhknyrDo6wuipnwusHAQ1kK8b4anLwWj";
-const PROGRAM_ID_AS_PUBKEY: Pubkey = Pubkey::from_str_const(PROGRAM_ID);
-const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
 
-pub fn get_identity_seeds_with_bump() -> [&'static [u8]; 3] {
-    [PREFIX, BASE_AS_PUBKEY.as_ref(), &[BUMP]]
+pub fn get_identity_seeds(bump: &u8) -> [&[u8]; 3] {
+    [PREFIX, BASE_AS_PUBKEY.as_ref(), core::slice::from_ref(bump)]
 }
 
-pub const fn get_identity_pda() -> Pubkey {
-    let bytes = Sha256::new()
-        .update(PREFIX)
-        .update(BASE_AS_PUBKEY.as_array())
-        .update(&[BUMP])
-        .update(PROGRAM_ID_AS_PUBKEY.as_array())
-        .update(PDA_MARKER)
-        .finalize();
-    Pubkey::new_from_array(bytes)
+pub fn get_identity_pda(program_id: &Pubkey) -> (Pubkey, u8) {
+    Pubkey::find_program_address(&[PREFIX, BASE_AS_PUBKEY.as_ref()], program_id)
 }
 
 pub fn vote_initialize_account(vote_pubkey: &Pubkey, vote_init: &VoteInit) -> Instruction {
@@ -136,6 +127,7 @@ mod tests {
 
     #[test]
     fn test_create_roundtrip() {
+        let program_id = Pubkey::new_unique();
         let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
         let authorized_voter = Pubkey::new_unique();
@@ -143,6 +135,7 @@ mod tests {
         let commission = 7;
 
         let ix = ProgramInstruction::create(
+            &program_id,
             &payer,
             &vote_account,
             &authorized_voter,
@@ -162,12 +155,5 @@ mod tests {
             }
             _ => panic!("expected Create"),
         }
-    }
-
-    #[test]
-    fn test_pda() {
-        let (_pda, bump) =
-            Pubkey::find_program_address(&[PREFIX, BASE_AS_PUBKEY.as_ref()], &PROGRAM_ID_AS_PUBKEY);
-        assert_eq!(bump, BUMP);
     }
 }

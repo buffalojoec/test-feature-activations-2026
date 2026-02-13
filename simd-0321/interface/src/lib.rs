@@ -51,12 +51,9 @@ impl EasterEgg {
     }
 }
 
-const PROGRAM_ID: &str = "HvhLZc4NB8gBjG2hMaHcCAnXto8pFTUs8hd434WJFWh1";
-pub const PROGRAM_ID_AS_PUBKEY: Pubkey = Pubkey::from_str_const(PROGRAM_ID);
-
-pub fn build_instruction(data: Vec<u8>) -> Instruction {
+pub fn build_instruction(program_id: &Pubkey, data: Vec<u8>) -> Instruction {
     Instruction {
-        program_id: PROGRAM_ID_AS_PUBKEY,
+        program_id: *program_id,
         accounts: vec![],
         data,
     }

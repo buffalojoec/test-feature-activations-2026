@@ -1,6 +1,6 @@
 use {
     simd_0185_interface::{
-        get_identity_seeds_with_bump, vote_initialize_account, ProgramInstruction,
+        get_identity_pda, get_identity_seeds, vote_initialize_account, ProgramInstruction,
     },
     solana_account_info::AccountInfo,
     solana_cpi::invoke_signed,
@@ -15,6 +15,7 @@ use {
 solana_program_entrypoint::entrypoint!(process);
 
 fn process_create(
+    program_id: &Pubkey,
     accounts: &[AccountInfo],
     authorized_voter: Pubkey,
     authorized_withdrawer: Pubkey,
@@ -26,7 +27,8 @@ fn process_create(
     let rent_sysvar = &accounts[3];
     let clock_sysvar = &accounts[4];
 
-    let pda_signer_seeds = &get_identity_seeds_with_bump();
+    let (_, bump) = get_identity_pda(program_id);
+    let pda_signer_seeds = &get_identity_seeds(&bump);
 
     let rent = Rent::from_account_info(rent_sysvar)?;
     let lamports = rent.minimum_balance(VoteStateV4::size_of());
@@ -105,13 +107,14 @@ fn process_view(accounts: &[AccountInfo]) -> ProgramResult {
     Ok(())
 }
 
-fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
+fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match ProgramInstruction::decode(input) {
         ProgramInstruction::Create {
             authorized_voter,
             authorized_withdrawer,
             commission,
         } => process_create(
+            program_id,
             accounts,
             authorized_voter,
             authorized_withdrawer,
@@ -136,18 +139,19 @@ mod tests {
         solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
     };
 
-    const PROGRAM_ID: Pubkey =
-        Pubkey::from_str_const("33H7aP44PfN6WhknyrDo6wuipnwusHAQ1kK8b4anLwWj");
-
-    fn setup(mollusk: &Mollusk) -> (Instruction, Instruction, Vec<(Pubkey, Account)>) {
+    fn setup(
+        program_id: &Pubkey,
+        mollusk: &Mollusk,
+    ) -> (Instruction, Instruction, Vec<(Pubkey, Account)>) {
         let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
-        let identity_pda = get_identity_pda();
+        let (identity_pda, _) = get_identity_pda(program_id);
         let authorized_voter = Pubkey::new_unique();
         let authorized_withdrawer = Pubkey::new_unique();
         let commission = 10;
 
         let create_ix = ProgramInstruction::create(
+            program_id,
             &payer,
             &vote_account,
             &authorized_voter,
@@ -155,7 +159,7 @@ mod tests {
             commission,
         );
 
-        let view_ix = ProgramInstruction::view(&vote_account);
+        let view_ix = ProgramInstruction::view(program_id, &vote_account);
 
         let lamports = mollusk.sysvars.rent.minimum_balance(VoteStateV4::size_of());
 
@@ -177,8 +181,9 @@ mod tests {
 
     #[test]
     fn test_create() {
-        let mollusk = Mollusk::new(&PROGRAM_ID, "simd_0185");
-        let (create_ix, _, accounts) = setup(&mollusk);
+        let program_id = Pubkey::new_unique();
+        let mollusk = Mollusk::new(&program_id, "simd_0185");
+        let (create_ix, _, accounts) = setup(&program_id, &mollusk);
 
         let vote_account = accounts[1].0;
 
@@ -199,18 +204,20 @@ mod tests {
             _ => panic!("expected v4 vote state"),
         };
 
-        assert_eq!(vote_state.node_pubkey, get_identity_pda());
+        let (identity_pda, _) = get_identity_pda(&program_id);
+        assert_eq!(vote_state.node_pubkey, identity_pda);
         assert_eq!(vote_state.inflation_rewards_commission_bps, 10_u16 * 100);
     }
 
     #[test]
     fn fail_feature_disabled() {
-        let mut mollusk = Mollusk::new(&PROGRAM_ID, "simd_0185");
+        let program_id = Pubkey::new_unique();
+        let mut mollusk = Mollusk::new(&program_id, "simd_0185");
         mollusk
             .feature_set
             .deactivate(&agave_feature_set::vote_state_v4::id());
 
-        let (create_ix, view_ix, accounts) = setup(&mollusk);
+        let (create_ix, view_ix, accounts) = setup(&program_id, &mollusk);
 
         let vote_account = accounts[1].0;
 

@@ -4,11 +4,9 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
-sha2-const-stable = { workspace = true }
 solana-instruction = { workspace = true, features = ["bincode"] }
 solana-pubkey = { workspace = true, features = ["curve25519"] }
 solana-sdk-ids = { workspace = true }
-solana-sha256-hasher = { workspace = true }
 solana-vote-interface = { workspace = true, features = ["bincode"] }
 
 [lints]
