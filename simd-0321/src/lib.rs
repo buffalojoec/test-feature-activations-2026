@@ -36,14 +36,14 @@ solana_program_entrypoint::custom_panic_default!();
 #[cfg(test)]
 mod tests {
     use {
+        agave_feature_set::provide_instruction_data_offset_in_vm_r2,
         mollusk_svm::{result::Check, Mollusk},
         simd_0321_interface::EasterEgg,
-        solana_instruction::Instruction,
+        solana_instruction::{error::InstructionError, Instruction},
         solana_pubkey::Pubkey,
         solana_svm_log_collector::LogCollector,
+        std::{cell::RefCell, rc::Rc},
     };
-
-    use std::{cell::RefCell, rc::Rc};
 
     fn setup(data: &[u8]) -> (Mollusk, Instruction, Rc<RefCell<LogCollector>>) {
         let program_id = Pubkey::new_unique();
@@ -60,9 +60,7 @@ mod tests {
         mollusk.process_and_validate_instruction(&instruction, &[], &[Check::success()]);
 
         let logs = log_collector.borrow().get_recorded_content().to_vec();
-        assert!(
-            logs.iter().any(|log| log.contains("[222, 173]")),
-        );
+        assert!(logs.iter().any(|log| log.contains("[222, 173]")),);
     }
 
     #[test]
@@ -73,7 +71,26 @@ mod tests {
         mollusk.process_and_validate_instruction(&instruction, &[], &[Check::success()]);
 
         let logs = log_collector.borrow().get_recorded_content().to_vec();
-        assert!(logs.iter().any(|log| log.contains("A secret has been unlocked")));
-        assert!(logs.iter().any(|log| log.contains("~ a warrior was here ~")));
+        assert!(logs
+            .iter()
+            .any(|log| log.contains("A secret has been unlocked")));
+        assert!(logs
+            .iter()
+            .any(|log| log.contains("~ a warrior was here ~")));
+    }
+
+    #[test]
+    fn fail_feature_disabled() {
+        let (mut mollusk, instruction, _) = setup(&[0xDE, 0xAD]);
+        mollusk
+            .feature_set
+            .deactivate(&provide_instruction_data_offset_in_vm_r2::id());
+        mollusk.process_and_validate_instruction(
+            &instruction,
+            &[],
+            &[Check::instruction_err(
+                InstructionError::ProgramFailedToComplete,
+            )],
+        );
     }
 }

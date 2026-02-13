@@ -3798,12 +3798,14 @@ dependencies = [
 name = "simd-0185"
 version = "0.0.0"
 dependencies = [
+ "agave-feature-set",
  "helpers",
  "mollusk-svm",
  "simd-0185-interface",
  "solana-account",
  "solana-account-info",
  "solana-cpi",
+ "solana-instruction",
  "solana-msg",
  "solana-program-entrypoint",
  "solana-program-error",
@@ -3831,6 +3833,7 @@ dependencies = [
 name = "simd-0321"
 version = "0.0.0"
 dependencies = [
+ "agave-feature-set",
  "helpers",
  "mollusk-svm",
  "simd-0321-interface",

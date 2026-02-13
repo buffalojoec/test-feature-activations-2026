@@ -21,6 +21,7 @@ solana-msg = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 
 [dev-dependencies]
+agave-feature-set = { workspace = true }
 mollusk-svm = { workspace = true }
 solana-instruction = { workspace = true }
 solana-pubkey = { workspace = true }

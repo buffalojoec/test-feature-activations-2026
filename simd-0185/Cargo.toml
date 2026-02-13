@@ -30,8 +30,10 @@ solana-system-interface = { workspace = true, features = ["bincode"] }
 solana-vote-interface = { workspace = true, features = ["bincode"] }
 
 [dev-dependencies]
+agave-feature-set = { workspace = true }
 mollusk-svm = { workspace = true, features = ["all-builtins"] }
 solana-account = { workspace = true }
+solana-instruction = { workspace = true }
 
 [lints]
 workspace = true

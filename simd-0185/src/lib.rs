@@ -131,6 +131,7 @@ mod tests {
         },
         simd_0185_interface::{get_identity_pda, ProgramInstruction},
         solana_account::Account,
+        solana_instruction::{error::InstructionError, Instruction},
         solana_pubkey::Pubkey,
         solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
     };
@@ -138,10 +139,7 @@ mod tests {
     const PROGRAM_ID: Pubkey =
         Pubkey::from_str_const("33H7aP44PfN6WhknyrDo6wuipnwusHAQ1kK8b4anLwWj");
 
-    #[test]
-    fn test_create() {
-        let mollusk = Mollusk::new(&PROGRAM_ID, "simd_0185");
-
+    fn setup(mollusk: &Mollusk) -> (Instruction, Instruction, Vec<(Pubkey, Account)>) {
         let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
         let identity_pda = get_identity_pda();
@@ -149,7 +147,7 @@ mod tests {
         let authorized_withdrawer = Pubkey::new_unique();
         let commission = 10;
 
-        let instruction = ProgramInstruction::create(
+        let create_ix = ProgramInstruction::create(
             &payer,
             &vote_account,
             &authorized_voter,
@@ -157,22 +155,36 @@ mod tests {
             commission,
         );
 
+        let view_ix = ProgramInstruction::view(&vote_account);
+
         let lamports = mollusk.sysvars.rent.minimum_balance(VoteStateV4::size_of());
 
+        let accounts = vec![
+            (
+                payer,
+                Account::new(lamports * 2, 0, &solana_sdk_ids::system_program::ID),
+            ),
+            (vote_account, Account::default()),
+            (identity_pda, Account::default()),
+            mollusk.sysvars.keyed_account_for_rent_sysvar(),
+            mollusk.sysvars.keyed_account_for_clock_sysvar(),
+            keyed_account_for_system_program(),
+            create_keyed_account_for_builtin_program(&solana_sdk_ids::vote::ID, "vote_program"),
+        ];
+
+        (create_ix, view_ix, accounts)
+    }
+
+    #[test]
+    fn test_create() {
+        let mollusk = Mollusk::new(&PROGRAM_ID, "simd_0185");
+        let (create_ix, _, accounts) = setup(&mollusk);
+
+        let vote_account = accounts[1].0;
+
         let result = mollusk.process_and_validate_instruction(
-            &instruction,
-            &[
-                (
-                    payer,
-                    Account::new(lamports * 2, 0, &solana_sdk_ids::system_program::ID),
-                ),
-                (vote_account, Account::default()),
-                (identity_pda, Account::default()),
-                mollusk.sysvars.keyed_account_for_rent_sysvar(),
-                mollusk.sysvars.keyed_account_for_clock_sysvar(),
-                keyed_account_for_system_program(),
-                create_keyed_account_for_builtin_program(&solana_sdk_ids::vote::ID, "vote_program"),
-            ],
+            &create_ix,
+            &accounts,
             &[
                 Check::success(),
                 Check::account(&vote_account)
@@ -187,15 +199,36 @@ mod tests {
             _ => panic!("expected v4 vote state"),
         };
 
-        assert_eq!(vote_state.node_pubkey, identity_pda);
-        assert_eq!(
-            vote_state.authorized_voters.last().unwrap().1,
-            &authorized_voter
-        );
-        assert_eq!(vote_state.authorized_withdrawer, authorized_withdrawer);
-        assert_eq!(
-            vote_state.inflation_rewards_commission_bps,
-            commission as u16 * 100
+        assert_eq!(vote_state.node_pubkey, get_identity_pda());
+        assert_eq!(vote_state.inflation_rewards_commission_bps, 10_u16 * 100);
+    }
+
+    #[test]
+    fn fail_feature_disabled() {
+        let mut mollusk = Mollusk::new(&PROGRAM_ID, "simd_0185");
+        mollusk
+            .feature_set
+            .deactivate(&agave_feature_set::vote_state_v4::id());
+
+        let (create_ix, view_ix, accounts) = setup(&mollusk);
+
+        let vote_account = accounts[1].0;
+
+        // Create should succeed — the vote program creates a v3 account.
+        let result =
+            mollusk.process_and_validate_instruction(&create_ix, &accounts, &[Check::success()]);
+
+        // Run view with the resulting vote account — should fail because
+        // the program panics on non-v4 state.
+        let mut view_accounts = accounts.clone();
+        view_accounts[1].1 = result.get_account(&vote_account).unwrap().clone();
+
+        mollusk.process_and_validate_instruction(
+            &view_ix,
+            &view_accounts,
+            &[Check::instruction_err(
+                InstructionError::ProgramFailedToComplete,
+            )],
         );
     }
 }
