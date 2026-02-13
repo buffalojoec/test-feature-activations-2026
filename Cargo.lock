@@ -1872,6 +1872,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 
 [[package]]
+name = "helpers"
+version = "0.0.0"
+dependencies = [
+ "solana-cli-config",
+ "solana-client",
+ "solana-commitment-config",
+ "solana-keypair",
+ "solana-transaction",
+]
+
+[[package]]
 name = "hermit-abi"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3787,15 +3798,12 @@ dependencies = [
 name = "simd-0185"
 version = "0.0.0"
 dependencies = [
+ "helpers",
  "mollusk-svm",
  "simd-0185-interface",
  "solana-account",
  "solana-account-info",
- "solana-cli-config",
- "solana-client",
- "solana-commitment-config",
  "solana-cpi",
- "solana-keypair",
  "solana-msg",
  "solana-program-entrypoint",
  "solana-program-error",
@@ -3804,7 +3812,6 @@ dependencies = [
  "solana-sdk-ids",
  "solana-system-interface 3.0.0",
  "solana-sysvar",
- "solana-transaction",
  "solana-vote-interface 5.1.0",
 ]
 
@@ -3824,6 +3831,7 @@ dependencies = [
 name = "simd-0321"
 version = "0.0.0"
 dependencies = [
+ "helpers",
  "simd-0321-interface",
  "solana-cpi",
  "solana-program-entrypoint",

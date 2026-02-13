@@ -12,22 +12,13 @@ path = "bin/main.rs"
 required-features = ["bin"]
 
 [features]
-bin = [
-    "dep:solana-cli-config",
-    "dep:solana-client",
-    "dep:solana-commitment-config",
-    "dep:solana-keypair",
-    "dep:solana-transaction",
-]
+bin = ["dep:helpers"]
 
 [dependencies]
+helpers = { workspace = true, optional = true }
 simd-0185-interface = { path = "interface" }
 solana-account-info = { workspace = true }
-solana-cli-config = { workspace = true, optional = true }
-solana-client = { workspace = true, optional = true }
-solana-commitment-config = { workspace = true, optional = true }
 solana-cpi = { workspace = true }
-solana-keypair = { workspace = true, optional = true }
 solana-msg = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 solana-program-error = { workspace = true }
@@ -36,7 +27,6 @@ solana-rent = { workspace = true }
 solana-sdk-ids = { workspace = true }
 solana-sysvar = { workspace = true, features = ["bincode"] }
 solana-system-interface = { workspace = true, features = ["bincode"] }
-solana-transaction = { workspace = true, optional = true }
 solana-vote-interface = { workspace = true, features = ["bincode"] }
 
 [dev-dependencies]

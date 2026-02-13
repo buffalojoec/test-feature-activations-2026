@@ -9,8 +9,13 @@ crate-type = ["cdylib"]
 [[bin]]
 name = "simd-0321"
 path = "bin/main.rs"
+required-features = ["bin"]
+
+[features]
+bin = ["dep:helpers"]
 
 [dependencies]
+helpers = { workspace = true, optional = true }
 simd-0321-interface = { path = "interface" }
 solana-cpi = { workspace = true }
 solana-program-entrypoint = { workspace = true }
