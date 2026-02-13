@@ -15,15 +15,15 @@ build-%:
 
 # Deploy a specific program.
 deploy-%:
-	solana program deploy target/deploy/$(subst -,_,$*).so
+	solana program deploy target/deploy/$(subst -,_,$*).so --program-id $*/keypair.json
 
 # Get a program ID.
 get-id-%:
 	solana address -k $*/keypair.json
 
-# Run a program test binary.
+# Run a program test binary. Optional: make test-<program> NETWORK=localnet
 test-%:
-	cargo run -p $*
+	cargo run -p $* --features bin $(if $(NETWORK),-- $(NETWORK))
 
 fmt:
 	cargo +nightly fmt --all --check
