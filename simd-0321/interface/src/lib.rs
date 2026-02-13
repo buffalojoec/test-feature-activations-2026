@@ -7,7 +7,7 @@ use {solana_program_error::ProgramError, solana_pubkey::Pubkey};
 pub struct EasterEgg {
     code: u64,
     key: [u8; 32],
-    message: String,
+    pub message: String,
 }
 
 const CODE: u64 = 0xffb;

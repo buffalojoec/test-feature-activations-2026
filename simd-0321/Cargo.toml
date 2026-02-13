@@ -24,6 +24,7 @@ solana-program-entrypoint = { workspace = true }
 mollusk-svm = { workspace = true }
 solana-instruction = { workspace = true }
 solana-pubkey = { workspace = true }
+solana-svm-log-collector = { workspace = true }
 
 [lints]
 workspace = true

@@ -3838,6 +3838,7 @@ dependencies = [
  "solana-msg",
  "solana-program-entrypoint",
  "solana-pubkey 4.0.0",
+ "solana-svm-log-collector",
 ]
 
 [[package]]
