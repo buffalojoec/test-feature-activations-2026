@@ -1,7 +1,7 @@
 use {
     helpers::{
-        read_keypair_file, CommitmentConfig, Keypair, OptionSerializer, RpcTransactionConfig,
-        Signer, Transaction, UiTransactionEncoding,
+        read_keypair_file, Keypair,
+        Signer, Transaction,
     },
     simd_0185_interface::ProgramInstruction,
 };
@@ -57,24 +57,5 @@ fn main() {
     println!("Success! Signature: {}", signature);
     println!();
 
-    // Fetch and print transaction logs.
-    let tx_response = client
-        .get_transaction_with_config(
-            &signature,
-            RpcTransactionConfig {
-                encoding: Some(UiTransactionEncoding::Json),
-                commitment: Some(CommitmentConfig::confirmed()),
-                max_supported_transaction_version: Some(0),
-            },
-        )
-        .expect("failed to fetch transaction");
-
-    if let Some(meta) = tx_response.transaction.meta {
-        if let OptionSerializer::Some(logs) = meta.log_messages {
-            println!("Transaction logs:");
-            for log in &logs {
-                println!("  {}", log);
-            }
-        }
-    }
+    helpers::print_transaction_logs_for_signature(&client, &signature);
 }

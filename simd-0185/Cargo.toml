@@ -11,6 +11,11 @@ name = "simd-0185"
 path = "bin/main.rs"
 required-features = ["bin"]
 
+[[bin]]
+name = "simd-0185-stake"
+path = "bin/stake.rs"
+required-features = ["bin"]
+
 [features]
 bin = ["dep:helpers"]
 
@@ -25,6 +30,7 @@ solana-program-error = { workspace = true }
 solana-pubkey = { workspace = true }
 solana-rent = { workspace = true }
 solana-sdk-ids = { workspace = true }
+solana-stake-interface = { workspace = true, features = ["bincode"] }
 solana-sysvar = { workspace = true, features = ["bincode"] }
 solana-system-interface = { workspace = true, features = ["bincode"] }
 solana-vote-interface = { workspace = true, features = ["bincode"] }

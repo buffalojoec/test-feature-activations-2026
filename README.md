@@ -40,6 +40,24 @@ The client sends a single transaction with two instructions:
 * `Create` — initializes a v4 vote account (10% commission)
 * `View` — reads back and logs the vote state fields
 
+### Stake binary
+
+A separate binary tests staking to vote accounts:
+
+```sh
+make run-simd-0185-stake VOTE_ACCOUNT=<pubkey> [NETWORK=localnet]
+```
+
+The stake binary creates a stake account, initializes it, and delegates 5,000
+lamports to the specified vote account. Defaults to localnet.
+
+To test with multiple random v4 vote accounts:
+
+```sh
+./scripts/test_stake_with_v4_vote_accounts.sh [file] [num_accounts] [network]
+# Defaults: file=scripts/out/vote_v4_accounts_localnet.txt, num_accounts=10, network=localnet
+```
+
 ### Fetch v4 vote accounts
 
 ```sh
@@ -86,6 +104,7 @@ The client sends two instructions in a single transaction:
 | `make get-id-<prog>` | Get a program's address from its keypair |
 | `make run-<prog>` | Run a program's client binary |
 | `make run-<prog> NETWORK=<url>` | Run against a specific network |
+| `make run-simd-0185-stake VOTE_ACCOUNT=<pubkey> [NETWORK=<net>]` | Run stake binary with specified vote account |
 | `make test` | Run unit tests (interfaces + helpers) |
 | `make test-sbf-<prog>` | Run SBF tests for a program (requires `cargo-build-sbf`) |
 | `make fmt` | Check formatting (requires nightly) |

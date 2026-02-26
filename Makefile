@@ -19,6 +19,14 @@ deploy-%:
 run-%:
 	cargo run -p $* --features bin $(if $(NETWORK),-- $(NETWORK))
 
+run-simd-0185-stake:
+	@if [ -z "$(VOTE_ACCOUNT)" ]; then \
+		echo "Error: VOTE_ACCOUNT is required"; \
+		echo "Usage: make run-simd-0185-stake VOTE_ACCOUNT=<pubkey> [NETWORK=<network>]"; \
+		exit 1; \
+	fi
+	cargo run --bin simd-0185-stake --features simd-0185/bin -- $(if $(NETWORK),$(NETWORK),localnet) $(VOTE_ACCOUNT)
+
 test:
 	cargo test $(addprefix -p ,helpers $(addsuffix -interface,$(PROGRAMS)))
 

@@ -8,7 +8,7 @@ pub use {
     },
     solana_commitment_config::CommitmentConfig,
     solana_keypair::{read_keypair_file, Keypair, Signer},
-    solana_transaction::Transaction,
+    solana_transaction::{Signature, Transaction},
 };
 
 pub fn rpc_url_from_network(network: &str) -> String {
@@ -52,4 +52,49 @@ pub fn client_from_args() -> (RpcClient, Keypair) {
 
     let client = RpcClient::new_with_commitment(rpc_url, CommitmentConfig::confirmed());
     (client, payer)
+}
+
+/// Create an `RpcClient` and load the payer keypair. If `network_override` is
+/// provided, use that network; otherwise, use the default from the Solana CLI
+/// config.
+pub fn client_with_network_override(network_override: Option<String>) -> (RpcClient, Keypair) {
+    let payer = load_payer();
+
+    if let Some(network) = network_override {
+        let rpc_url = rpc_url_from_network(&network);
+        println!("RPC URL: {}", rpc_url);
+        let client = RpcClient::new_with_commitment(rpc_url, CommitmentConfig::confirmed());
+        (client, payer)
+    } else {
+        let config = load_config();
+        println!("RPC URL: {}", config.json_rpc_url);
+        let client = RpcClient::new_with_commitment(config.json_rpc_url, CommitmentConfig::confirmed());
+        (client, payer)
+    }
+}
+
+/// Fetch and print transaction logs for a given signature.
+pub fn print_transaction_logs_for_signature(
+    client: &RpcClient,
+    signature: &Signature,
+) {
+    let tx_response = client
+        .get_transaction_with_config(
+            signature,
+            RpcTransactionConfig {
+                encoding: Some(UiTransactionEncoding::Json),
+                commitment: Some(CommitmentConfig::confirmed()),
+                max_supported_transaction_version: Some(0),
+            },
+        )
+        .expect("failed to fetch transaction");
+
+    if let Some(meta) = tx_response.transaction.meta {
+        if let OptionSerializer::Some(logs) = meta.log_messages {
+            println!("Transaction logs:");
+            for log in &logs {
+                println!("  {}", log);
+            }
+        }
+    }
 }

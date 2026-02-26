@@ -14,6 +14,7 @@ edition = "2021"
 
 [workspace.dependencies]
 agave-feature-set = "3.1"
+helpers = { path = "helpers" }
 mollusk-svm = "0.10.3"
 solana-account = "3.4"
 solana-account-info = "3.1"
@@ -29,12 +30,11 @@ solana-program-error = "3.0"
 solana-pubkey = "4.0"
 solana-rent = "3.1"
 solana-sdk-ids = "3.1.0"
+solana-stake-interface = "3.0"
 solana-sysvar = { version = "3.1" }
 solana-system-interface = { version = "3.0" }
 solana-svm-log-collector = "3.1"
 solana-transaction = "3.1"
-
-helpers = { path = "helpers" }
 solana-vote-interface = "5.0"
 
 [workspace.lints.rust.unexpected_cfgs]
