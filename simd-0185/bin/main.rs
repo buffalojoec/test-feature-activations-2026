@@ -1,8 +1,5 @@
 use {
-    helpers::{
-        read_keypair_file, Keypair,
-        Signer, Transaction,
-    },
+    helpers::{read_keypair_file, Keypair, Signer, Transaction},
     simd_0185_interface::ProgramInstruction,
 };
 

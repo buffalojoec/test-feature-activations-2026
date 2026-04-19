@@ -1,8 +1,5 @@
 use {
-    helpers::{
-        read_keypair_file, Signer,
-        Transaction,
-    },
+    helpers::{read_keypair_file, Signer, Transaction},
     simd_0321_interface::{build_instruction, EasterEgg},
 };
 
