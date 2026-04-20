@@ -58,9 +58,8 @@ fn process_view(accounts: &[AccountInfo]) -> ProgramResult {
         _ => panic!("expected v4 vote state"),
     };
 
-    let bls_pubkey = match vote_state.bls_pubkey_compressed {
-        Some(pubkey) => pubkey,
-        _ => panic!("expected some bls key"),
+    let Some(bls_pubkey) = vote_state.bls_pubkey_compressed else {
+        panic!("expected some bls key");
     };
 
     msg!("What's the matter, you've never seen a compressed BLS pubkey before?");
@@ -93,6 +92,7 @@ mod tests {
         simd_0387_interface::ProgramInstruction,
         solana_account::Account,
         solana_instruction::Instruction,
+        solana_program_error::ProgramError,
         solana_pubkey::Pubkey,
         solana_sdk_ids::system_program,
         solana_vote_interface::{
@@ -216,31 +216,31 @@ mod tests {
         );
     }
 
-    // #[test]
-    // fn fail_feature_disabled() {
-    //     let program_id = Pubkey::new_unique();
-    //     let authorized_voter = Pubkey::new_unique();
-    //     let vote_pubkey = Pubkey::new_unique();
-    //     let mut mollusk = Mollusk::new(&program_id, "simd_0387");
-    //     mollusk
-    //         .feature_set
-    //         .deactivate(&agave_feature_set::bls_key_management::id());
+    #[test]
+    fn fail_feature_disabled() {
+        let program_id = Pubkey::new_unique();
+        let authorized_voter = Pubkey::new_unique();
+        let vote_pubkey = Pubkey::new_unique();
+        let mut mollusk = Mollusk::new(&program_id, "simd_0387");
+        mollusk
+            .feature_set
+            .deactivate(&agave_feature_set::bls_pubkey_management_in_vote_account::id());
 
-    //     let (set_ix, _, accounts) = setup(
-    //         &program_id,
-    //         &authorized_voter,
-    //         &vote_pubkey,
-    //         &Pubkey::new_unique(),
-    //         &[4u8; BLS_PUBLIC_KEY_COMPRESSED_SIZE],
-    //         &[4u8; BLS_PROOF_OF_POSSESSION_COMPRESSED_SIZE],
-    //         &mollusk,
-    //     );
+        let (set_ix, _, accounts) = setup(
+            &program_id,
+            &authorized_voter,
+            &vote_pubkey,
+            &Pubkey::new_unique(),
+            &[4u8; BLS_PUBLIC_KEY_COMPRESSED_SIZE],
+            &[4u8; BLS_PROOF_OF_POSSESSION_COMPRESSED_SIZE],
+            &mollusk,
+        );
 
-    //     // Should fail - VoterWithBls is disabled.
-    //     mollusk.process_and_validate_instruction(
-    //         &set_ix,
-    //         &accounts,
-    //         &[Check::instruction_err(InstructionError::InvalidInstructionData)],
-    //     );
-    // }
+        // Should fail - VoterWithBls is disabled.
+        mollusk.process_and_validate_instruction(
+            &set_ix,
+            &accounts,
+            &[Check::err(ProgramError::InvalidInstructionData)],
+        );
+    }
 }

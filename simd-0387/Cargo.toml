@@ -7,21 +7,21 @@ edition = { workspace = true }
 crate-type = ["cdylib"]
 
 [[bin]]
-name = "simd-0185"
+name = "simd-0387"
 path = "bin/main.rs"
 required-features = ["bin"]
 
-[[bin]]
-name = "simd-0185-stake"
-path = "bin/stake.rs"
-required-features = ["bin"]
-
 [features]
-bin = ["dep:helpers"]
+bin = [
+    "dep:helpers",
+    "dep:solana-account",
+    "dep:solana-vote-program",
+]
 
 [dependencies]
 helpers = { workspace = true, optional = true }
 simd-0387-interface = { path = "interface" }
+solana-account = { workspace = true, optional = true }
 solana-account-info = { workspace = true }
 solana-bls-signatures = { workspace = true, features = ["serde"], optional = true }
 solana-cpi = { workspace = true }
@@ -35,6 +35,7 @@ solana-stake-interface = { workspace = true, features = ["bincode"] }
 solana-sysvar = { workspace = true, features = ["bincode"] }
 solana-system-interface = { workspace = true, features = ["bincode"] }
 solana-vote-interface = { workspace = true, features = ["bincode"] }
+solana-vote-program = { workspace = true, features = ["agave-unstable-api"], optional = true }
 
 [dev-dependencies]
 agave-feature-set = { workspace = true }
