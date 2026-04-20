@@ -1,7 +1,5 @@
 use {
-    helpers::{
-        Keypair, Signer, Transaction,
-    },
+    helpers::{Keypair, Signer, Transaction},
     solana_pubkey::Pubkey,
     solana_stake_interface::{
         instruction::{delegate_stake, initialize},
@@ -30,8 +28,7 @@ fn main() {
         std::process::exit(1);
     };
 
-    let vote_account = Pubkey::from_str(&vote_account_arg)
-        .expect("Invalid vote account pubkey");
+    let vote_account = Pubkey::from_str(&vote_account_arg).expect("Invalid vote account pubkey");
 
     let (client, payer) = helpers::client_with_network_override(network_override);
 
@@ -72,18 +69,10 @@ fn main() {
     };
     let lockup = Lockup::default();
 
-    let initialize_ix = initialize(
-        &stake_account.pubkey(),
-        &authorized,
-        &lockup,
-    );
+    let initialize_ix = initialize(&stake_account.pubkey(), &authorized, &lockup);
 
     // Step 3: Delegate stake.
-    let delegate_ix = delegate_stake(
-        &stake_account.pubkey(),
-        &payer.pubkey(),
-        &vote_account,
-    );
+    let delegate_ix = delegate_stake(&stake_account.pubkey(), &payer.pubkey(), &vote_account);
 
     // Build, sign, and send the transaction.
     let blockhash = client

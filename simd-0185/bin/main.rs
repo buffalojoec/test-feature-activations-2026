@@ -1,8 +1,5 @@
 use {
-    helpers::{
-        read_keypair_file, Keypair,
-        Signer, Transaction,
-    },
+    helpers::{read_keypair_file, Keypair, Signer, Transaction},
     simd_0185_interface::ProgramInstruction,
 };
 
@@ -13,9 +10,11 @@ fn main() {
         read_keypair_file("simd-0185/keypair.json").expect("failed to read program keypair");
     let program_id = program_id.pubkey();
 
+    let authorized_voter = read_keypair_file("simd-0185/authorized-voter.json")
+        .expect("failed to read authorized voter keypair");
+
     // Generate a fresh keypair for the vote account.
     let vote_account = Keypair::new();
-    let authorized_voter = Keypair::new();
     let authorized_withdrawer = Keypair::new();
     let commission = 10;
 

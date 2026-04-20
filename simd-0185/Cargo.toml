@@ -2,6 +2,7 @@
 name = "simd-0185"
 version = { workspace = true }
 edition = { workspace = true }
+default-run = "simd-0185"
 
 [lib]
 crate-type = ["cdylib"]
@@ -40,6 +41,7 @@ agave-feature-set = { workspace = true }
 mollusk-svm = { workspace = true, features = ["all-builtins"] }
 solana-account = { workspace = true }
 solana-instruction = { workspace = true }
+solana-keypair = { workspace = true }
 
 [lints]
 workspace = true

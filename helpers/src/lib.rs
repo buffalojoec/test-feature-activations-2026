@@ -68,16 +68,14 @@ pub fn client_with_network_override(network_override: Option<String>) -> (RpcCli
     } else {
         let config = load_config();
         println!("RPC URL: {}", config.json_rpc_url);
-        let client = RpcClient::new_with_commitment(config.json_rpc_url, CommitmentConfig::confirmed());
+        let client =
+            RpcClient::new_with_commitment(config.json_rpc_url, CommitmentConfig::confirmed());
         (client, payer)
     }
 }
 
 /// Fetch and print transaction logs for a given signature.
-pub fn print_transaction_logs_for_signature(
-    client: &RpcClient,
-    signature: &Signature,
-) {
+pub fn print_transaction_logs_for_signature(client: &RpcClient, signature: &Signature) {
     let tx_response = client
         .get_transaction_with_config(
             signature,

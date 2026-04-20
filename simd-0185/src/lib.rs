@@ -135,9 +135,13 @@ mod tests {
         simd_0185_interface::{get_identity_pda, ProgramInstruction},
         solana_account::Account,
         solana_instruction::{error::InstructionError, Instruction},
+        solana_keypair::{read_keypair_file, Signer},
         solana_pubkey::Pubkey,
         solana_vote_interface::state::{VoteStateV4, VoteStateVersions},
     };
+
+    const AUTHORIZED_VOTER_KEYPAIR: &str =
+        concat!(env!("CARGO_MANIFEST_DIR"), "/authorized-voter.json");
 
     fn setup(
         program_id: &Pubkey,
@@ -146,7 +150,9 @@ mod tests {
         let payer = Pubkey::new_unique();
         let vote_account = Pubkey::new_unique();
         let (identity_pda, _) = get_identity_pda(program_id);
-        let authorized_voter = Pubkey::new_unique();
+        let authorized_voter = read_keypair_file(AUTHORIZED_VOTER_KEYPAIR)
+            .expect("failed to read authorized voter keypair")
+            .pubkey();
         let authorized_withdrawer = Pubkey::new_unique();
         let commission = 10;
 
