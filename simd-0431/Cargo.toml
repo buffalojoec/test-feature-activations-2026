@@ -1,0 +1,16 @@
+[package]
+name = "simd-0431"
+version = { workspace = true }
+edition = { workspace = true }
+
+[[bin]]
+name = "simd-0431"
+path = "bin/extend.rs"
+
+[dependencies]
+helpers = { workspace = true }
+solana-instruction = { workspace = true }
+solana-loader-v3-interface = { workspace = true, features = ["bincode"] }
+
+[lints]
+workspace = true

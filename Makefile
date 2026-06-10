@@ -1,4 +1,6 @@
-PROGRAMS := $(shell find . -maxdepth 1 -type d -name 'simd-*' -exec test -f {}/Cargo.toml \; -print | sed 's|./||' | sort)
+# On-chain programs have a lib (`src/lib.rs`); client-only cases (e.g.
+# simd-0431) are excluded.
+PROGRAMS := $(shell find . -maxdepth 1 -type d -name 'simd-*' -exec test -f {}/src/lib.rs \; -print | sed 's|./||' | sort)
 
 .PHONY: build
 
@@ -34,6 +36,9 @@ run-simd-0387:
 		exit 1; \
 	fi
 	cargo run -p simd-0387 --features bin -- $(if $(NETWORK),$(NETWORK),localnet) $(VOTE_ACCOUNT)
+
+run-simd-0431:
+	cargo run -p simd-0431 -- $(if $(NETWORK),$(NETWORK),localnet)
 
 test:
 	cargo test $(addprefix -p ,helpers $(addsuffix -interface,$(PROGRAMS)))

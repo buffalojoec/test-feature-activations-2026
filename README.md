@@ -93,6 +93,28 @@ The client sends two instructions in a single transaction:
 * Raw bytes (`0xDEADBEEF`) — logged as a byte array
 * `EasterEgg` payload — triggers ASCII owl output
 
+## 📏 SIMD-0431: Minimum Extend Program Size
+
+Tests the `loader_v3_minimum_extend_program_size` feature, which requires
+Loader V3 `ExtendProgram` instructions to add at least 10 KiB (unless
+extending to the max permitted data length). No dedicated on-chain program —
+the client extends the deployed SIMD-0387 program's ProgramData account.
+
+### Run on testnet
+
+Requires `simd-0387/keypair.json` and a deployed SIMD-0387 program
+(`make deploy-simd-0387`).
+
+```sh
+make run-simd-0431 NETWORK=testnet
+```
+
+The client sends two transactions against the SIMD-0387 ProgramData account:
+
+* Extend by 10,239 bytes — expected to fail with `InvalidArgument`
+* Extend by 10,240 bytes — expected to succeed; the client verifies the
+  account grew by exactly 10 KiB
+
 ## Makefile
 
 | Target | Description |
@@ -105,6 +127,7 @@ The client sends two instructions in a single transaction:
 | `make run-<prog>` | Run a program's client binary |
 | `make run-<prog> NETWORK=<url>` | Run against a specific network |
 | `make run-simd-0185-stake VOTE_ACCOUNT=<pubkey> [NETWORK=<net>]` | Run stake binary with specified vote account |
+| `make run-simd-0431 [NETWORK=<net>]` | Run extend-program binary against the SIMD-0387 program |
 | `make test` | Run unit tests (interfaces + helpers) |
 | `make test-sbf-<prog>` | Run SBF tests for a program (requires `cargo-build-sbf`) |
 | `make fmt` | Check formatting (requires nightly) |

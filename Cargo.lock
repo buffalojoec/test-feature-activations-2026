@@ -118,7 +118,7 @@ dependencies = [
  "solana-hash 4.3.0",
  "solana-instruction",
  "solana-keccak-hasher",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-poseidon",
  "solana-program-entrypoint",
  "solana-program-runtime",
@@ -2592,7 +2592,7 @@ dependencies = [
  "solana-instruction",
  "solana-instruction-error",
  "solana-instructions-sysvar",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-loader-v4-interface",
  "solana-loader-v4-program",
  "solana-logger",
@@ -3937,6 +3937,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "simd-0431"
+version = "0.0.0"
+dependencies = [
+ "helpers",
+ "solana-instruction",
+ "solana-loader-v3-interface 7.0.0",
+]
+
+[[package]]
 name = "simd-adler32"
 version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4010,7 +4019,7 @@ dependencies = [
  "solana-epoch-schedule",
  "solana-fee-calculator",
  "solana-instruction",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-nonce",
  "solana-program-option",
  "solana-program-pack",
@@ -4226,7 +4235,7 @@ dependencies = [
  "solana-bincode",
  "solana-clock",
  "solana-instruction",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-loader-v4-interface",
  "solana-packet 4.1.0",
  "solana-program-entrypoint",
@@ -4717,6 +4726,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "solana-loader-v3-interface"
+version = "7.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68029ab11d9c891d4ce23ada75745e40f983c5674af366f447b672569634231b"
+dependencies = [
+ "serde",
+ "serde_bytes",
+ "serde_derive",
+ "solana-instruction",
+ "solana-pubkey 4.2.0",
+ "solana-sdk-ids",
+ "solana-system-interface 3.2.0",
+]
+
+[[package]]
 name = "solana-loader-v4-interface"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4742,7 +4766,7 @@ dependencies = [
  "solana-bincode",
  "solana-bpf-loader-program",
  "solana-instruction",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-loader-v4-interface",
  "solana-packet 4.1.0",
  "solana-program-runtime",
@@ -5047,7 +5071,7 @@ dependencies = [
  "solana-hash 4.3.0",
  "solana-instruction",
  "solana-last-restart-slot",
- "solana-loader-v3-interface",
+ "solana-loader-v3-interface 6.1.0",
  "solana-program-entrypoint",
  "solana-pubkey 4.2.0",
  "solana-rent 3.1.0",
