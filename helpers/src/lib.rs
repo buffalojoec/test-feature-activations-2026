@@ -2,13 +2,15 @@ use solana_cli_config::CONFIG_FILE;
 pub use {
     solana_cli_config::Config,
     solana_client::{
+        client_error::{ClientError, ClientErrorKind},
         rpc_client::RpcClient,
         rpc_config::{RpcTransactionConfig, UiTransactionEncoding},
+        rpc_request::{RpcError, RpcResponseErrorData},
         rpc_response::OptionSerializer,
     },
     solana_commitment_config::CommitmentConfig,
     solana_keypair::{read_keypair_file, Keypair, Signer},
-    solana_transaction::{Signature, Transaction},
+    solana_transaction::{Signature, Transaction, TransactionError},
 };
 
 pub fn rpc_url_from_network(network: &str) -> String {
@@ -71,6 +73,22 @@ pub fn client_with_network_override(network_override: Option<String>) -> (RpcCli
         let client =
             RpcClient::new_with_commitment(config.json_rpc_url, CommitmentConfig::confirmed());
         (client, payer)
+    }
+}
+
+/// Print the simulation logs attached to a preflight failure, if any.
+pub fn print_preflight_failure_logs(error: &ClientError) {
+    if let ClientErrorKind::RpcError(RpcError::RpcResponseError {
+        data: RpcResponseErrorData::SendTransactionPreflightFailure(result),
+        ..
+    }) = &*error.kind
+    {
+        if let Some(logs) = &result.logs {
+            println!("Preflight simulation logs:");
+            for log in logs {
+                println!("  {}", log);
+            }
+        }
     }
 }
 
