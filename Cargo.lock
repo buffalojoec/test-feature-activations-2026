@@ -131,7 +131,7 @@ dependencies = [
  "solana-stake-interface 2.0.2",
  "solana-svm-callback",
  "solana-svm-feature-set 4.0.0-beta.7",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-measure",
  "solana-svm-timings",
  "solana-svm-type-overrides 4.0.0-beta.7",
@@ -2606,7 +2606,7 @@ dependencies = [
  "solana-slot-hashes",
  "solana-stake-interface 2.0.2",
  "solana-svm-callback",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-timings",
  "solana-svm-transaction",
  "solana-system-program",
@@ -3886,7 +3886,7 @@ dependencies = [
  "solana-msg",
  "solana-program-entrypoint",
  "solana-pubkey 4.2.0",
- "solana-svm-log-collector 3.1.8",
+ "solana-svm-log-collector",
 ]
 
 [[package]]
@@ -4235,7 +4235,7 @@ dependencies = [
  "solana-sbpf 0.14.4",
  "solana-sdk-ids",
  "solana-svm-feature-set 4.0.0-beta.7",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-measure",
  "solana-svm-type-overrides 4.0.0-beta.7",
  "solana-system-interface 3.2.0",
@@ -4749,7 +4749,7 @@ dependencies = [
  "solana-pubkey 4.2.0",
  "solana-sbpf 0.14.4",
  "solana-sdk-ids",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-measure",
  "solana-svm-type-overrides 4.0.0-beta.7",
  "solana-transaction-context 4.0.0-beta.7",
@@ -5058,7 +5058,7 @@ dependencies = [
  "solana-stake-interface 2.0.2",
  "solana-svm-callback",
  "solana-svm-feature-set 4.0.0-beta.7",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-measure",
  "solana-svm-timings",
  "solana-svm-transaction",
@@ -5638,15 +5638,6 @@ checksum = "2770de6ab3b2f74b1942128fe6e32f343f4df23b116e9b94bd6860b753d0551b"
 
 [[package]]
 name = "solana-svm-log-collector"
-version = "3.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbe6ce42b1620fd713e12cd52d62a7d4d370414d67ed9bfc5faa444fa54bb6f2"
-dependencies = [
- "log",
-]
-
-[[package]]
-name = "solana-svm-log-collector"
 version = "4.0.0-beta.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9cbf4f01eb9bcb5067f8dba54faff46ce6e2994257a200ee7bb1c33d77cb920e"
@@ -5752,7 +5743,7 @@ dependencies = [
  "solana-program-runtime",
  "solana-pubkey 4.2.0",
  "solana-sdk-ids",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-svm-type-overrides 4.0.0-beta.7",
  "solana-system-interface 3.2.0",
  "solana-sysvar 3.1.1",
@@ -6150,7 +6141,7 @@ dependencies = [
  "solana-instruction",
  "solana-program-runtime",
  "solana-sdk-ids",
- "solana-svm-log-collector 4.0.0-beta.7",
+ "solana-svm-log-collector",
  "solana-zk-sdk 5.0.1",
 ]
 
